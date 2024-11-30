@@ -132,7 +132,7 @@ const ModalMovie = () => {
       onRequestClose={handleClose}
       className="h-screen overflow-y-scroll"
     >
-      <Loading loading={loading}>
+      <Loading loading={loading} spinnerClass="w-70 h-70">
         <div className="relative h-full w-full bg-black">
           <img
             src={`https://img.ophim.live/uploads/movies/${movieInfo?.poster_url}`}

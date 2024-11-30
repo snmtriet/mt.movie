@@ -29,7 +29,11 @@ const DefaultLoading = (props: BaseLoadingProps) => {
       {customLoader ? (
         <>{customLoader}</>
       ) : (
-        <Spinner className={spinnerClass} size={40} />
+        // <Spinner className={spinnerClass} size={40} />
+        <img
+          src="/images/site-spinner.png"
+          className={cn('h-40 w-40 animate-spin', spinnerClass)}
+        />
       )}
     </Component>
   ) : (
