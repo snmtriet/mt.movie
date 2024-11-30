@@ -53,11 +53,13 @@ const ModalMovie = () => {
     )
   }
 
-  const renderActors = () => {
+  const renderActors = (isShowAll?: boolean) => {
     if (!movieInfo?.actor) return null
     return (
       movieInfo.actor.length > 4
-        ? [...movieInfo.actor, 'more'].slice(-4)
+        ? [...movieInfo.actor, !isShowAll && 'more']
+            .filter(Boolean)
+            .slice(isShowAll ? 0 : -4)
         : movieInfo.actor
     ).map((actor, index) => (
       <Text key={index} className="text-white/60">
@@ -244,6 +246,11 @@ const ModalMovie = () => {
                             <FaPlay size={28} />
                           </div>
                         </div>
+                        <div className="absolute right-0 top-0 z-10 rounded-bl bg-red-700 p-1 shadow-lg">
+                          <Text size="sm" bold>
+                            {item.lang}
+                          </Text>
+                        </div>
                         <Image
                           src={`https://img.ophim.live/uploads/movies/${item?.poster_url}`}
                           className="h-full w-full object-cover transition-transform duration-150 group-hover:scale-110"
@@ -270,7 +277,7 @@ const ModalMovie = () => {
             <hr className="bg-dark/60" />
             <div className="mt-6" id="about-movie-info">
               <Heading as="h2" className="my-4">
-                Về <strong>{movieInfo?.name}</strong>
+                <strong>{movieInfo?.name}</strong>
               </Heading>
               <div className="flex flex-shrink-0 flex-col lg:min-w-[300px]">
                 <div className="my-1 flex items-center break-words">
@@ -279,7 +286,7 @@ const ModalMovie = () => {
                 </div>
                 <div className="my-1 flex items-center break-words">
                   <Text className="mr-1 text-white/60">Diễn viên:</Text>
-                  {renderActors()}
+                  {renderActors(true)}
                 </div>
                 <div className="my-1 flex items-center break-words">
                   <Text className="mr-1 text-white/60">Thể loại:</Text>
