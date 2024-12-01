@@ -1,14 +1,24 @@
 import { Movie } from '@/@types/movie'
 import { getMovieByCategory, getMovieDetail } from '@/services/MovieService'
 import { setModalMovie, useAppDispatch, useAppSelector } from '@/store'
-import { useEffect, useState } from 'react'
+import { cn } from '@/utils'
+import { useEffect, useRef, useState } from 'react'
 import { AiOutlineLike } from 'react-icons/ai'
 import { BsPlusLg } from 'react-icons/bs'
 import { FaPlay } from 'react-icons/fa'
+import { IoIosArrowDown } from 'react-icons/io'
 import { Link } from 'react-router-dom'
 import { Button, Heading, Image, Modal, Text } from '../ui'
 import Card from './Card'
 import Loading from './Loading'
+
+function convertToSlug(str: string) {
+  return str
+    .normalize('NFD') // Break down combined letters into base letters and diacritics
+    .replace(/[\u0300-\u036f]/g, '') // Remove diacritic marks
+    .toLowerCase() // Convert to lowercase
+    .replace(/\s+/g, '-') // Replace spaces with hyphens
+}
 
 const ModalMovie = () => {
   const { open, slug } = useAppSelector((state) => state.movie.modalMovie)
@@ -16,6 +26,27 @@ const ModalMovie = () => {
   const [movieInfo, setMovieInfo] = useState<Movie | null>(null)
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
+  const [isModalScroll, setIsModalScroll] = useState(false)
+  const [limit, setLimit] = useState(9)
+  const modalRef = useRef<HTMLDivElement | null>(null)
+
+  useEffect(() => {
+    if (!open) return
+    if (modalRef.current) {
+      modalRef.current.addEventListener('scroll', () => {
+        const scrollTop = modalRef.current?.scrollTop || 0
+        setIsModalScroll(scrollTop > 50)
+      })
+    }
+
+    return () => {
+      modalRef.current &&
+        modalRef.current.removeEventListener('scroll', () => {
+          const scrollTop = modalRef.current?.scrollTop || 0
+          setIsModalScroll(scrollTop > 50)
+        })
+    }
+  }, [open, modalRef])
 
   useEffect(() => {
     fetchMovies()
@@ -23,6 +54,7 @@ const ModalMovie = () => {
     return () => {
       setMovieInfo(null)
       setMovies([])
+      setLimit(9)
     }
   }, [slug])
 
@@ -33,7 +65,9 @@ const ModalMovie = () => {
       const movieInfo = await getMovieDetail({ slug })
       setMovieInfo(movieInfo)
       const indexRandom = Math.floor(Math.random() * movieInfo.category?.length)
-      const randomCategorySlug = movieInfo.category?.[indexRandom]?.name
+      const randomCategorySlug = convertToSlug(
+        movieInfo.category?.[indexRandom]?.name,
+      )
       const movies = await getMovieByCategory({
         slug: randomCategorySlug,
       })
@@ -65,7 +99,7 @@ const ModalMovie = () => {
       <Text key={index} className="text-white/60">
         <Link
           to="#"
-          className="text-white hover:underline"
+          className="whitespace-nowrap text-white hover:underline"
           onClick={(e) => {
             if (actor === 'more') {
               e.preventDefault()
@@ -125,12 +159,22 @@ const ModalMovie = () => {
     ))
   }
 
+  const toggleShowMovies = () => {
+    setLimit((prev) => (prev === 9 ? 24 : 9))
+  }
+
   return (
     <Modal
       open={open}
+      noScroll
       onClose={handleClose}
       onRequestClose={handleClose}
-      className="h-screen overflow-y-scroll"
+      className={cn(
+        'h-screen overflow-y-scroll transition-all',
+        isModalScroll && 'mt-none',
+        !isModalScroll && 'mt-20',
+      )}
+      ref={modalRef}
     >
       <Loading loading={loading} spinnerClass="w-70 h-70">
         <div className="relative h-full w-full bg-black">
@@ -158,7 +202,7 @@ const ModalMovie = () => {
                 className="mb-3 select-none leading-8 text-white/60"
                 bold
               >
-                ({movieInfo?.origin_name})
+                {movieInfo?.origin_name}
               </Heading>
               <div className="flex items-center gap-md">
                 <Button
@@ -206,9 +250,11 @@ const ModalMovie = () => {
                           (episode, index) => (
                             <button
                               key={index}
-                              className="h-10 min-w-10 whitespace-nowrap rounded bg-red-800 transition-colors hover:bg-red-700"
+                              className="h-10 min-w-10 whitespace-nowrap rounded bg-dark-3 px-1 transition-colors hover:bg-red-800"
                             >
-                              {episode.name?.split('(')?.[0]?.trim()}
+                              <Text>
+                                {episode.name?.split(' ')?.[0]?.trim()}
+                              </Text>
                             </button>
                           ),
                         )}
@@ -217,16 +263,22 @@ const ModalMovie = () => {
                   )}
               </div>
               <div className="flex flex-shrink-0 flex-col lg:min-w-[300px]">
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Diễn viên:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Diễn viên:
+                  </Text>
                   {renderActors()}
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Thể loại:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Thể loại:
+                  </Text>
                   {renderGenres()}
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Quốc gia:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Quốc gia:
+                  </Text>
                   {renderCountry()}
                 </div>
               </div>
@@ -238,7 +290,7 @@ const ModalMovie = () => {
               <div className="grid grid-cols-1 gap-md sm:grid-cols-2 lg:grid-cols-3">
                 {movies &&
                   movies.length > 0 &&
-                  movies.map((item, index) => (
+                  movies.slice(0, limit).map((item, index) => (
                     <Card key={index} className="group cursor-pointer p-0">
                       <div className="relative w-full overflow-hidden">
                         <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
@@ -274,38 +326,76 @@ const ModalMovie = () => {
                   ))}
               </div>
             </div>
-            <hr className="bg-dark/60" />
-            <div className="mt-6" id="about-movie-info">
+            <div
+              className={cn(
+                'relative mx-auto flex w-full justify-center border-b-2 border-b-[#404040]',
+                {
+                  '-mt-[100px] h-[100px]': limit === 9,
+                  'h-[50px]': limit === 24,
+                },
+              )}
+              style={{
+                backgroundImage:
+                  'linear-gradient(0deg,#181818 0,hsla(0,0%,9%,.7) 20%,hsla(0,0%,9%,.4) 30%,transparent 50%)',
+              }}
+            >
+              <button
+                className="absolute bottom-0 flex translate-y-1/2 items-center justify-center rounded-full border border-white/70 bg-[#2a2a2a99] p-2 hover:border-white hover:bg-white/40"
+                onClick={toggleShowMovies}
+              >
+                <IoIosArrowDown
+                  size={24}
+                  className={cn('transition-transform ease-linear', {
+                    'rotate-180': limit === 24,
+                  })}
+                />
+              </button>
+            </div>
+            <div className="my-6" id="about-movie-info">
               <Heading as="h2" className="my-4">
                 <strong>{movieInfo?.name}</strong>
               </Heading>
               <div className="flex flex-shrink-0 flex-col lg:min-w-[300px]">
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Đạo diễn:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Đạo diễn:
+                  </Text>
                   {renderDirectors()}
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Diễn viên:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Diễn viên:
+                  </Text>
                   {renderActors(true)}
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Thể loại:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Thể loại:
+                  </Text>
                   {renderGenres()}
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Quốc gia:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Quốc gia:
+                  </Text>
                   {renderCountry()}
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Năm:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Năm:
+                  </Text>
                   <Text>{movieInfo?.year}</Text>
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Cập nhật:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Cập nhật:
+                  </Text>
                   <Text>{movieInfo?.episode_current}</Text>
                 </div>
-                <div className="my-1 flex items-center break-words">
-                  <Text className="mr-1 text-white/60">Chất lượng:</Text>
+                <div className="my-1 flex flex-wrap items-center break-words">
+                  <Text className="mr-1 whitespace-nowrap text-white/60">
+                    Chất lượng:
+                  </Text>
                   <Text>
                     {movieInfo?.quality} + {movieInfo?.lang}
                   </Text>
