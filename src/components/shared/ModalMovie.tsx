@@ -35,7 +35,7 @@ const ModalMovie = () => {
     if (modalRef.current) {
       modalRef.current.addEventListener('scroll', () => {
         const scrollTop = modalRef.current?.scrollTop || 0
-        setIsModalScroll(scrollTop > 50)
+        setIsModalScroll(scrollTop > 0)
       })
     }
 
@@ -43,7 +43,7 @@ const ModalMovie = () => {
       modalRef.current &&
         modalRef.current.removeEventListener('scroll', () => {
           const scrollTop = modalRef.current?.scrollTop || 0
-          setIsModalScroll(scrollTop > 50)
+          setIsModalScroll(scrollTop > 0)
         })
     }
   }, [open, modalRef])
@@ -172,7 +172,7 @@ const ModalMovie = () => {
       className={cn(
         'h-screen overflow-y-scroll transition-all',
         isModalScroll && 'mt-none',
-        !isModalScroll && 'mt-20',
+        !isModalScroll && 'mt-28 lg:mt-20',
       )}
       ref={modalRef}
     >
@@ -305,7 +305,9 @@ const ModalMovie = () => {
                         </div>
                         <Image
                           src={`https://img.ophim.live/uploads/movies/${item?.poster_url}`}
-                          className="h-full w-full object-cover transition-transform duration-150 group-hover:scale-110"
+                          className="aspect-video h-full w-full object-cover transition-transform duration-150 group-hover:scale-110"
+                          loading="eager"
+                          loadingClassName="h-full"
                         />
                       </div>
                       <div className="p-2">
@@ -351,7 +353,7 @@ const ModalMovie = () => {
                 />
               </button>
             </div>
-            <div className="my-6" id="about-movie-info">
+            <div className="mt-6 pb-14 lg:pb-6" id="about-movie-info">
               <Heading as="h2" className="my-4">
                 <strong>{movieInfo?.name}</strong>
               </Heading>
