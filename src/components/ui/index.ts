@@ -6,5 +6,6 @@ import Section from './Section'
 import Input from './Input'
 import Image from './Image'
 import Modal from './Modal'
+import Skeleton from './Skeleton'
 
-export { Text, Button, Heading, Tag, Section, Input, Image, Modal }
+export { Text, Button, Heading, Tag, Section, Input, Image, Modal, Skeleton }

@@ -66,6 +66,16 @@
   animation: animateSpinnerPath 1.5s ease-in-out infinite;
 }
 
+.loader:after {
+  animation: loader 2s infinite cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes loader {
+  to {
+    transform: translate3d(100%, 0, 0);
+  }
+}
+
 @media screen and (min-width: 768px) {
   .preloader__item {
     width: 200px;

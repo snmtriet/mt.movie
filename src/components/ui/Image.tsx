@@ -1,5 +1,5 @@
 import { cn } from '@/utils'
-import React, { useRef, useState } from 'react'
+import { ImgHTMLAttributes, useRef, useState } from 'react'
 import { CSSTransition } from 'react-transition-group'
 import { Loading } from '../shared'
 
@@ -7,10 +7,11 @@ type Props = {
   className?: string
   loadingClassName?: string
   onError?: (error: boolean) => void
-} & React.ImgHTMLAttributes<HTMLImageElement>
+  onLoad?: (loaded: boolean) => void
+} & Omit<ImgHTMLAttributes<HTMLImageElement>, 'onError' | 'onLoad'>
 
 const Image = (props: Props) => {
-  const { className, onError, ...rest } = props
+  const { className, onError, onLoad, ...rest } = props
   const [loaded, setLoaded] = useState(false)
   const overlayRef = useRef(null)
   const imgRef = useRef<HTMLImageElement>(null)
@@ -27,6 +28,7 @@ const Image = (props: Props) => {
 
   function handleLoad() {
     setLoaded(true)
+    onLoad?.(true)
   }
 
   return (
@@ -41,7 +43,7 @@ const Image = (props: Props) => {
       >
         <div
           ref={overlayRef}
-          className="absolute inset-0 flex h-full w-full items-center justify-center"
+          className="absolute inset-0 z-10 flex h-full w-full items-center justify-center bg-dark"
         >
           <Loading loading />
         </div>

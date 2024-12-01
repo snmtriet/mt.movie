@@ -4,9 +4,11 @@ import { Button, Heading, Image, Text } from '../ui'
 import { useEffect, useState } from 'react'
 import { getHotMovies, getMovieDetail } from '@/services/MovieService'
 import { Movie } from '@/@types/movie'
+import { setModalMovie, useAppDispatch } from '@/store'
 
 const BannerMovie = () => {
-  const [hotMovies, setHotMovies] = useState<Movie | null>(null)
+  const [hotMovie, setHotMovie] = useState<Movie | null>(null)
+  const dispatch = useAppDispatch()
 
   useEffect(() => {
     fetchMovies()
@@ -17,10 +19,20 @@ const BannerMovie = () => {
       const hotMovies = await getHotMovies()
       const firstMovie = hotMovies?.[0]
       const movieInfo = await getMovieDetail({ slug: firstMovie.slug })
-      setHotMovies(movieInfo)
+      setHotMovie(movieInfo)
     } catch (error) {
       console.error(error)
     }
+  }
+
+  function handleOpenMovie() {
+    if (!hotMovie) return
+    dispatch(
+      setModalMovie({
+        open: true,
+        slug: hotMovie.slug,
+      }),
+    )
   }
 
   return (
@@ -28,7 +40,7 @@ const BannerMovie = () => {
       <div className="relative left-0 right-0 top-0 mb-[20px] touch-pan-y select-none pb-[40%]">
         <div className="absolute inset-0 h-[56.25vw] w-full">
           <Image
-            src={`https://img.ophim.live/uploads/movies/${hotMovies?.poster_url}`}
+            src={`https://img.ophim.live/uploads/movies/${hotMovie?.poster_url}`}
             className="w-full bg-cover bg-center"
           />
           <div
@@ -57,9 +69,9 @@ const BannerMovie = () => {
                 }}
                 bold
               >
-                {hotMovies?.name}
+                {hotMovie?.name}
               </Heading>
-              {hotMovies?.content && (
+              {hotMovie?.content && (
                 <Text
                   size="xl"
                   style={{
@@ -69,7 +81,7 @@ const BannerMovie = () => {
                 >
                   <p
                     dangerouslySetInnerHTML={{
-                      __html: hotMovies?.content?.slice(0, 200) + '...',
+                      __html: hotMovie?.content?.slice(0, 200) + '...',
                     }}
                   ></p>
                 </Text>
@@ -88,6 +100,7 @@ const BannerMovie = () => {
                   before={
                     <IoInformationCircleOutline className="mr-1" size={26} />
                   }
+                  onClick={handleOpenMovie}
                 >
                   <Text size="xl" className="whitespace-nowrap">
                     Thông tin khác

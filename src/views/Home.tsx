@@ -19,6 +19,7 @@ const Home = () => {
   const [tvShows, setTvShows] = useState<Movie[]>([])
   const [cartoonMovies, setCartoonMovies] = useState<Movie[]>([])
   const [mostViewedMovies, setMostViewedMovies] = useState<Movie[]>([])
+  const [loading, setLoading] = useState(true)
 
   useEffect(() => {
     fetchMovies()
@@ -26,6 +27,7 @@ const Home = () => {
 
   async function fetchMovies() {
     try {
+      setLoading(true)
       const data = await getNewestMovies()
       setMovies(data)
       const featureMoviesData = await getFeatureMovies()
@@ -40,6 +42,8 @@ const Home = () => {
       setMostViewedMovies(mostViewedMovies)
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
   return (
@@ -56,6 +60,7 @@ const Home = () => {
           </div>
         </div>
         <MovieSlide
+          loading={loading}
           movies={movies}
           navigation={{
             nextEl: '.newest-movies-next',
@@ -75,6 +80,7 @@ const Home = () => {
           </div>
         </div>
         <MovieSlide
+          loading={loading}
           movies={mostViewedMovies}
           navigation={{
             nextEl: '.mostViewed-movies-next',
@@ -94,6 +100,7 @@ const Home = () => {
           </div>
         </div>
         <MovieSlide
+          loading={loading}
           movies={featureMovies}
           navigation={{
             nextEl: '.feature-movies-next',
@@ -113,6 +120,7 @@ const Home = () => {
           </div>
         </div>
         <MovieSlide
+          loading={loading}
           movies={seriesMovies}
           navigation={{
             nextEl: '.series-movies-next',
@@ -132,6 +140,7 @@ const Home = () => {
           </div>
         </div>
         <MovieSlide
+          loading={loading}
           movies={tvShows}
           navigation={{
             nextEl: '.tvShows-movies-next',
@@ -151,6 +160,7 @@ const Home = () => {
           </div>
         </div>
         <MovieSlide
+          loading={loading}
           movies={cartoonMovies}
           navigation={{
             nextEl: '.cartoon-movies-next',
