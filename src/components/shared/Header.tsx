@@ -4,10 +4,11 @@ import { GoSearch } from 'react-icons/go'
 import { IoMdNotificationsOutline } from 'react-icons/io'
 import { RiArrowDownSFill } from 'react-icons/ri'
 import { Link } from 'react-router-dom'
-import { Heading, Tag, Text } from '../ui'
+import { Heading, Input, Tag, Text } from '../ui'
 
 const Header = () => {
   const [scrollOffset, setScrollOffset] = useState(0)
+  const [openSearch, setOpenSearch] = useState(false)
 
   useEffect(() => {
     const handleScroll = () => {
@@ -16,6 +17,10 @@ const Header = () => {
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
+
+  function handleOpenSearch() {
+    setOpenSearch(true)
+  }
 
   return (
     <>
@@ -49,9 +54,11 @@ const Header = () => {
             </div>
             <nav className="ml-10 hidden md:block">
               <ul className="flex items-center gap-lg">
-                <Text className="cursor-pointer text-light-1 hover:text-light">
-                  Trang chủ
-                </Text>
+                <Link to="/">
+                  <Text className="cursor-pointer text-light-1 hover:text-light">
+                    Trang chủ
+                  </Text>
+                </Link>
                 <Text className="cursor-pointer text-light-1 hover:text-light">
                   Phim
                 </Text>
@@ -65,7 +72,22 @@ const Header = () => {
             </nav>
           </div>
           <div className="flex items-center gap-lg">
-            <GoSearch size={24} />
+            <div>
+              <div
+                className={cn({ 'rounded border border-white/60': openSearch })}
+              >
+                <div className="flex items-center justify-between pl-1">
+                  <GoSearch
+                    size={24}
+                    className="cursor-pointer"
+                    onClick={handleOpenSearch}
+                  />
+                  {openSearch && (
+                    <Input placeholder="Tìm kiếm..." className="border-none" />
+                  )}
+                </div>
+              </div>
+            </div>
             <div className="relative">
               <IoMdNotificationsOutline size={24} />
               <div className="absolute -right-1.5 -top-1 flex h-4 w-4 items-center justify-center rounded-full bg-red-700 text-sm">

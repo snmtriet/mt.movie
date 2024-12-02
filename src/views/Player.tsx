@@ -11,6 +11,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 const Player = () => {
   const params = useParams()
   const [movie, setMovie] = useState<Movie | null>(null)
+  const [loading, setLoading] = useState(false)
   const [episodes, setEpisodes] = useState<ServerDaum[]>([])
   const navigate = useNavigate()
 
@@ -21,6 +22,7 @@ const Player = () => {
   async function fetchMovie() {
     if (!params.slug) return
     try {
+      setLoading(true)
       const movieInfo = await getMovieDetail({ slug: params.slug })
       const listEpisodes = movieInfo?.episodes[0].server_data
       listEpisodes[0].link_embed
@@ -28,6 +30,8 @@ const Player = () => {
       setEpisodes(listEpisodes)
     } catch (error) {
       console.error(error)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -44,13 +48,23 @@ const Player = () => {
 
   return (
     <div className="relative flex h-full min-h-screen w-full items-center justify-center bg-black">
+      {loading && (
+        <div className="absolute inset-0 flex h-full w-full items-center justify-center">
+          <Loading loading spinnerClass="w-[100px] h-[100px]" />
+        </div>
+      )}
+      {!getUrlVideo() && !loading && (
+        <Heading className="text-center">
+          Vui lòng quay lại sau, chúng tôi đang cập nhật phim
+        </Heading>
+      )}
       <div
         className="absolute inset-x-0 top-0 z-10 h-[60px] w-full"
         style={{
           backgroundImage:
             'linear-gradient(rgba(0, 0, 0, 0.7) 10%, transparent)',
         }}
-      ></div>
+      />
       <button
         className="absolute left-4 top-4 z-10 flex items-center gap-xs"
         onClick={handleBack}

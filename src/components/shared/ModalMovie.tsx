@@ -24,7 +24,6 @@ const ModalMovie = () => {
   const { open, slug } = useAppSelector((state) => state.movie.modalMovie)
   const dispatch = useAppDispatch()
   const [movieInfo, setMovieInfo] = useState<Movie | null>(null)
-  console.log('🍕 ~ movieInfo:', movieInfo)
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalScroll, setIsModalScroll] = useState(false)
