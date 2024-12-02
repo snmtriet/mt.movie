@@ -107,7 +107,7 @@ const ModalMovie = () => {
             if (actor === 'more') {
               e.preventDefault()
               const aboutSection = document.getElementById('about-movie-info')
-              aboutSection?.scrollIntoView()
+              aboutSection?.scrollIntoView({ behavior: 'smooth', block: 'end' })
             }
           }}
         >
@@ -241,7 +241,7 @@ const ModalMovie = () => {
         </div>
         <div className="relative w-full bg-dark">
           <div className="px-2 md:px-8">
-            <div className="my-2 flex flex-col items-start justify-between gap-xl lg:flex-row">
+            <div className="my-2 flex flex-col items-start justify-between md:gap-xl lg:flex-row">
               <div>
                 <div
                   dangerouslySetInnerHTML={{
@@ -250,7 +250,7 @@ const ModalMovie = () => {
                 ></div>
                 {movieInfo?.episodes?.[0]?.server_data &&
                   movieInfo?.episodes?.[0]?.server_data?.length > 1 && (
-                    <div className="pb-8">
+                    <div className="pb-4">
                       <Heading as="h2" className="my-4">
                         Tập phim
                       </Heading>

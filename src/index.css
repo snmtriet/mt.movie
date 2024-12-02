@@ -72,7 +72,6 @@
   box-sizing: border-box;
   scrollbar-color: #373a47 transparent;
   scrollbar-width: thin;
-  scroll-behavior: smooth;
 }
 
 html {
