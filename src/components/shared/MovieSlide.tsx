@@ -2,13 +2,14 @@ import { Movie } from '@/@types/movie'
 import { setModalMovie, useAppDispatch } from '@/store'
 import { cn } from '@/utils'
 import { useRef, useState } from 'react'
+import { CSSTransition } from 'react-transition-group'
 import { Navigation } from 'swiper/modules'
 import { Swiper, SwiperSlide } from 'swiper/react'
 import { NavigationOptions, SwiperModule } from 'swiper/types'
 import { useWindowSize } from 'usehooks-ts'
 import { Image, Skeleton, Text } from '../ui'
 import Card from './Card'
-import { CSSTransition } from 'react-transition-group'
+import { useSearchParams } from 'react-router-dom'
 
 type Props = {
   showIndex?: boolean
@@ -25,6 +26,7 @@ const MovieSlide = (props: Props) => {
   const [isSlideChange, setIsSlideChange] = useState(false)
   const modules = [Navigation].filter(Boolean) as SwiperModule[]
   const loadingRef = useRef<HTMLDivElement>(null)
+  const [, setSearchParams] = useSearchParams({ openSlug: '' })
 
   const handleOpenMovie = (movie: Movie) => {
     dispatch(
@@ -33,6 +35,7 @@ const MovieSlide = (props: Props) => {
         slug: movie.slug,
       }),
     )
+    setSearchParams({ openSlug: movie.slug })
   }
 
   return (

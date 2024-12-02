@@ -1,8 +1,6 @@
 import { AppRoute } from '@/components/route'
 import { Loading } from '@/components/shared'
 import appsRoute from '@/configs/appsRoute'
-import { useAppSelector } from '@/store'
-import { cn } from '@/utils'
 import { AnimatePresence } from 'framer-motion'
 import { Suspense } from 'react'
 import { Outlet, Route, Routes, useLocation } from 'react-router-dom'
@@ -38,22 +36,11 @@ const AllRoutes = () => {
 }
 
 const Views = () => {
-  const { theme } = useAppSelector((state) => state.setting)
-
   return (
     <Suspense
       fallback={
-        <div
-          className={cn(
-            'loading-center',
-            theme === 'dark' ? 'bg-dark' : 'bg-light',
-          )}
-        >
-          <Loading
-            type="preloader"
-            loading={true}
-            spinnerClass={cn(theme === 'dark' ? 'text-light' : 'text-dark')}
-          />
+        <div className="loading-center bg-dark">
+          <Loading loading />
         </div>
       }
     >

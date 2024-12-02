@@ -10,7 +10,9 @@ import {
   getSeriesMovies,
   getTvShows,
 } from '@/services/MovieService'
+import { setModalMovie, useAppDispatch } from '@/store'
 import { useEffect, useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 
 const Home = () => {
   const [movies, setMovies] = useState<Movie[]>([])
@@ -20,6 +22,19 @@ const Home = () => {
   const [cartoonMovies, setCartoonMovies] = useState<Movie[]>([])
   const [mostViewedMovies, setMostViewedMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
+  const [searchParams] = useSearchParams({ openSlug: '' })
+  const openSlug = searchParams.get('openSlug')
+  const dispatch = useAppDispatch()
+
+  useEffect(() => {
+    if (!openSlug) return
+    dispatch(
+      setModalMovie({
+        open: true,
+        slug: openSlug,
+      }),
+    )
+  }, [openSlug])
 
   useEffect(() => {
     fetchMovies()

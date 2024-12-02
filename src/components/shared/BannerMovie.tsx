@@ -5,10 +5,12 @@ import { useEffect, useState } from 'react'
 import { getHotMovies, getMovieDetail } from '@/services/MovieService'
 import { Movie } from '@/@types/movie'
 import { setModalMovie, useAppDispatch } from '@/store'
+import { Link, useSearchParams } from 'react-router-dom'
 
 const BannerMovie = () => {
   const [hotMovie, setHotMovie] = useState<Movie | null>(null)
   const dispatch = useAppDispatch()
+  const [, setSearchParams] = useSearchParams({ openSlug: '' })
 
   useEffect(() => {
     fetchMovies()
@@ -33,6 +35,7 @@ const BannerMovie = () => {
         slug: hotMovie.slug,
       }),
     )
+    setSearchParams({ openSlug: hotMovie.slug })
   }
 
   return (
@@ -87,13 +90,17 @@ const BannerMovie = () => {
                 </Text>
               )}
               <div className="mt-md flex items-center gap-md lg:mt-xl">
-                <Button
-                  className="px-4 py-5"
-                  variant="white"
-                  before={<FaPlay className="mr-1" size={20} />}
+                <Link
+                  to={`/player/${hotMovie?.slug}/${hotMovie?.episodes[0].server_data[0].slug}`}
                 >
-                  <Text size="xl">Phát</Text>
-                </Button>
+                  <Button
+                    className="px-4 py-5"
+                    variant="white"
+                    before={<FaPlay className="mr-1" size={20} />}
+                  >
+                    <Text size="xl">Phát</Text>
+                  </Button>
+                </Link>
                 <Button
                   variant="secondary"
                   className="px-4 py-5"

@@ -7,6 +7,11 @@ const appsRoute: Routes = [
     path: '/',
     component: lazy(() => import('@/views/Home')),
   },
+  {
+    key: 'app.player',
+    path: '/player/:slug/:episode',
+    component: lazy(() => import('@/views/Player')),
+  },
 ]
 
 export default appsRoute

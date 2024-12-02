@@ -7,7 +7,7 @@ import { AiOutlineLike } from 'react-icons/ai'
 import { BsPlusLg } from 'react-icons/bs'
 import { FaPlay } from 'react-icons/fa'
 import { IoIosArrowDown } from 'react-icons/io'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate, useSearchParams } from 'react-router-dom'
 import { Button, Heading, Image, Modal, Text } from '../ui'
 import Card from './Card'
 import Loading from './Loading'
@@ -24,11 +24,14 @@ const ModalMovie = () => {
   const { open, slug } = useAppSelector((state) => state.movie.modalMovie)
   const dispatch = useAppDispatch()
   const [movieInfo, setMovieInfo] = useState<Movie | null>(null)
+  console.log('🍕 ~ movieInfo:', movieInfo)
   const [movies, setMovies] = useState<Movie[]>([])
   const [loading, setLoading] = useState(true)
   const [isModalScroll, setIsModalScroll] = useState(false)
   const [limit, setLimit] = useState(9)
   const modalRef = useRef<HTMLDivElement | null>(null)
+  const [, setSearchParams] = useSearchParams({ openSlug: '' })
+  const navigate = useNavigate()
 
   useEffect(() => {
     if (!open) return
@@ -85,6 +88,7 @@ const ModalMovie = () => {
         open: false,
       }),
     )
+    setSearchParams({ openSlug: '' })
   }
 
   const renderActors = (isShowAll?: boolean) => {
@@ -163,6 +167,11 @@ const ModalMovie = () => {
     setLimit((prev) => (prev === 9 ? 24 : 9))
   }
 
+  const handlePlay = (movie?: Movie | null, episode?: number) => {
+    if (!movie) return
+    navigate(`/player/${movie.slug}/${episode ?? 1}`)
+  }
+
   return (
     <Modal
       open={open}
@@ -209,6 +218,7 @@ const ModalMovie = () => {
                   className="md:px-6 md:py-5"
                   variant="white"
                   before={<FaPlay className="mr-2" size={20} />}
+                  onClick={() => handlePlay(movieInfo)}
                 >
                   <Text size="xl">Phát</Text>
                 </Button>
@@ -246,18 +256,15 @@ const ModalMovie = () => {
                         Tập phim
                       </Heading>
                       <div className="flex flex-wrap gap-md">
-                        {movieInfo?.episodes[0].server_data?.map(
-                          (episode, index) => (
-                            <button
-                              key={index}
-                              className="h-10 min-w-10 whitespace-nowrap rounded bg-dark-3 px-1 transition-colors hover:bg-red-800"
-                            >
-                              <Text>
-                                {episode.name?.split(' ')?.[0]?.trim()}
-                              </Text>
-                            </button>
-                          ),
-                        )}
+                        {movieInfo?.episodes[0].server_data?.map((_, index) => (
+                          <button
+                            key={index}
+                            className="h-10 min-w-10 whitespace-nowrap rounded bg-dark-3 px-1 transition-colors hover:bg-red-800"
+                            onClick={() => handlePlay(movieInfo, index + 1)}
+                          >
+                            <Text>{index + 1}</Text>
+                          </button>
+                        ))}
                       </div>
                     </div>
                   )}
@@ -291,7 +298,11 @@ const ModalMovie = () => {
                 {movies &&
                   movies.length > 0 &&
                   movies.slice(0, limit).map((item, index) => (
-                    <Card key={index} className="group cursor-pointer p-0">
+                    <Card
+                      key={index}
+                      className="group cursor-pointer p-0"
+                      onClick={() => handlePlay(item)}
+                    >
                       <div className="relative w-full overflow-hidden">
                         <div className="absolute inset-0 z-10 flex items-center justify-center opacity-0 transition-opacity duration-300 group-hover:opacity-100">
                           <div className="flex items-center justify-center rounded-full border p-2">

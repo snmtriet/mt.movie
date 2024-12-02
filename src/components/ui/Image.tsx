@@ -11,17 +11,16 @@ type Props = {
 } & Omit<ImgHTMLAttributes<HTMLImageElement>, 'onError' | 'onLoad'>
 
 const Image = (props: Props) => {
-  const { className, onError, onLoad, ...rest } = props
+  const { className, onError, onLoad, loadingClassName, ...rest } = props
   const [loaded, setLoaded] = useState(false)
   const overlayRef = useRef(null)
   const imgRef = useRef<HTMLImageElement>(null)
   const [error, setError] = useState(false)
 
   function handleError() {
-    if (imgRef.current) {
+    if (loaded && imgRef.current) {
       imgRef.current.src = '/images/image-placeholder.png'
     }
-    setLoaded(true)
     setError(true)
     onError?.(true)
   }
@@ -53,7 +52,7 @@ const Image = (props: Props) => {
         className={cn(
           'opacity-0 transition-opacity duration-300 ease-linear',
           {
-            loadingClassName: !loaded,
+            [loadingClassName as string]: !loaded,
             'opacity-100': loaded,
             'opacity-60': error,
           },
